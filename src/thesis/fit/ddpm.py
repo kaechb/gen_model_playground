@@ -1,32 +1,11 @@
 
-import matplotlib.pyplot as plt
-import mplhep as hep
-import nflows as nf
-import numpy as np
-import pandas as pd
 import lightning.pytorch as pl
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
-from hist import Hist
-from jetnet.evaluation import fpd, get_fpd_kpd_jet_features, kpd, w1m
-#from src.models.coimport torchdiffeqmponents.diffusion import VPDiffusionSchedule
-from torch import Tensor, nn
-from torch.distributions import Normal
-from torch.nn import functional as F
-from torch.optim.lr_scheduler import (ExponentialLR, OneCycleLR,
-                                      ReduceLROnPlateau)
-from torchcfm.conditional_flow_matching import (
-    ConditionalFlowMatcher, ExactOptimalTransportConditionalFlowMatcher, TargetConditionalFlowMatcher,
-    SchrodingerBridgeConditionalFlowMatcher)
-from torchdyn.core import NeuralODE
+from torch import nn
 from pl_bolts.optimizers.lr_scheduler import LinearWarmupCosineAnnealingLR
 from ..models.model import Model
-from copy import deepcopy
-from torch.cuda import amp
 import torch
-from torchdyn.models import NeuralODE
-from torch.distributions import Normal
 
 class torch_wrapper(torch.nn.Module):
     """Wraps model to torchdyn compatible format."""
@@ -53,9 +32,6 @@ class DDPM(pl.LightningModule):
         self.automatic_optimization = False
         self.save_name=self.hparams.name
         self.name=self.hparams.name
-        #This is the Normalizing flow model to be used later, it uses as many
-        #coupling_layers as given in the config
-
         self.net = Model(**self.hparams).to("cuda")
         s = 0.008 #noise variance beta
         timesteps = torch.tensor(range(0, self.hparams.num_steps), dtype=torch.float32).to("cuda" if torch.cuda.is_available() else "cpu")

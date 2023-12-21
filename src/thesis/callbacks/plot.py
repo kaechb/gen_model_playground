@@ -2,7 +2,6 @@ import torch
 from ..utils import plot, plot_latent
 import os
 import lightning as pl
-from my_cmaps import cmap
 import matplotlib.pyplot as plt
 from lightning.pytorch.loggers import WandbLogger
 class PlotCallback(pl.Callback):

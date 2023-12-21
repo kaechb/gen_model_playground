@@ -9,7 +9,7 @@ import lightning as pl
 import torch
 from lightning.pytorch import Callback
 from lightning.pytorch.callbacks import ModelCheckpoint
-from lightning.pytorch.utilities import rank_zero_info, rank_zero_warn
+from lightning.pytorch.utilities import rank_zero_info
 from lightning.pytorch.utilities.exceptions import MisconfigurationException
 from lightning.pytorch.utilities.types import STEP_OUTPUT
 

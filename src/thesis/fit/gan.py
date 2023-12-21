@@ -1,15 +1,8 @@
 
-from typing import Any
-from lightning.pytorch.utilities.types import STEP_OUTPUT
-from torch.utils.data import DataLoader
-from torch import nn
-from torch.optim.lr_scheduler import ExponentialLR
-from torch import autograd
-from torch.autograd import grad
 import lightning as pl
 import torch
 from pl_bolts.optimizers.lr_scheduler import LinearWarmupCosineAnnealingLR
-from ..utils import plot,least_squares,wasserstein,non_saturating,gradient_penalty
+from ..utils import gradient_penalty, least_squares, non_saturating, wasserstein
 from ..models.model import Model
 
 class GAN(pl.LightningModule):

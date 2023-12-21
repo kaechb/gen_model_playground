@@ -1,6 +1,5 @@
 
 import lightning.pytorch as pl
-import torch
 import numpy as np
 import scipy
 class FrechetDistanceCallback(pl.Callback):
