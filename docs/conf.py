@@ -43,6 +43,7 @@ MOCK_MODULES = [
     "torchdyn",
     "torchcfm",
     "torchmetrics",
+    "pl_bolts"
 
 
 
