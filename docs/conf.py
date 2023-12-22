@@ -32,6 +32,7 @@ MOCK_MODULES = [
     "numpy",
     "torch",
     "torch.nn",
+    "torch.nn.utils",
     "torch.nn.functional",
     "torch.utils",
     "torch.utils.data",
