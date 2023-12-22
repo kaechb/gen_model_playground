@@ -53,7 +53,7 @@ class EMA(Callback):
         self.evaluate_ema_weights_instead = evaluate_ema_weights_instead
         self.decay = decay
 
-    def on_train_start(self, trainer: "pl.Trainer", pl_module: "pl.LightningModule") -> None:
+    def on_train_start(self, trainer: "pl.Trainer", pl_module: "pl.LightningModule"):
 
         if self._ema_model_weights is None:
             self._ema_model_weights = [p.detach().clone() for p in pl_module.state_dict().values()]
@@ -61,10 +61,10 @@ class EMA(Callback):
         self._ema_model_weights = [p.to(pl_module.device) for p in self._ema_model_weights]
         self._overflow_buf = torch.IntTensor([0]).to(pl_module.device)
 
-    def ema(self, pl_module: "pl.LightningModule") -> None:
+    def ema(self, pl_module: "pl.LightningModule"):
         return self.apply_ema(pl_module)
 
-    def apply_ema(self, pl_module: "pl.LightningModule") -> None:
+    def apply_ema(self, pl_module: "pl.LightningModule"):
         for orig_weight, ema_weight in zip(
             list(pl_module.state_dict().values()), self._ema_model_weights
         ):
@@ -74,7 +74,7 @@ class EMA(Callback):
                 diff.mul_(1.0 - self.decay)
                 ema_weight.sub_(diff)
 
-    def should_apply_ema(self, step: int) -> bool:
+    def should_apply_ema(self, step: int):
         return (
             step != self._cur_step
             and step >= self.start_step
@@ -88,17 +88,17 @@ class EMA(Callback):
         outputs: pl.utilities.types.STEP_OUTPUT,
         batch: Any,
         batch_idx: int,
-    ) -> None:
+    ):
         if self.should_apply_ema(trainer.global_step):
             self._cur_step = trainer.global_step
             self.ema(pl_module)
 
-    def state_dict(self) -> Dict[str, Any]:
+    def state_dict(self) :
         if self.save_ema_weights_in_callback_state:
             return dict(cur_step=self._cur_step, ema_weights=self._ema_model_weights)
         return dict(cur_step=self._cur_step)
 
-    def load_state_dict(self, state_dict: Dict[str, Any]) -> None:
+    def load_state_dict(self, state_dict: Dict[str, Any]):
         self._cur_step = state_dict["cur_step"]
         # when loading within apps such as NeMo, EMA weights will be loaded by the experiment manager separately
         if self._ema_model_weights is None:
@@ -106,7 +106,7 @@ class EMA(Callback):
 
     def on_load_checkpoint(
         self, trainer: "pl.Trainer", pl_module: "pl.LightningModule", checkpoint: Dict[str, Any]
-    ) -> None:
+    ):
         checkpoint_callback = trainer.checkpoint_callback
 
         if trainer.ckpt_path and checkpoint_callback is not None:
@@ -127,7 +127,7 @@ class EMA(Callback):
                     UserWarning,
                 )
 
-    def replace_model_weights(self, pl_module: "pl.LightningModule") -> None:
+    def replace_model_weights(self, pl_module: "pl.LightningModule"):
         self._weights_buffer = [
             p.detach().clone().to("cpu") for p in pl_module.state_dict().values()
         ]
@@ -136,34 +136,33 @@ class EMA(Callback):
         }
         pl_module.load_state_dict(new_state_dict)
 
-    def restore_original_weights(self, pl_module: "pl.LightningModule") -> None:
+    def restore_original_weights(self, pl_module: "pl.LightningModule"):
         state_dict = pl_module.state_dict()
         new_state_dict = {k: v for k, v in zip(state_dict.keys(), self._weights_buffer)}
         pl_module.load_state_dict(new_state_dict)
         del self._weights_buffer
 
     @property
-    def ema_initialized(self) -> bool:
+    def ema_initialized(self):
         return self._ema_model_weights is not None
 
-    def on_validation_start(self, trainer: "pl.Trainer", pl_module: "pl.LightningModule") -> None:
+    def on_validation_start(self, trainer: "pl.Trainer", pl_module: "pl.LightningModule"):
         if self.ema_initialized and self.evaluate_ema_weights_instead:
             self.replace_model_weights(pl_module)
 
-    def on_validation_end(self, trainer: "pl.Trainer", pl_module: "pl.LightningModule") -> None:
+    def on_validation_end(self, trainer: "pl.Trainer", pl_module: "pl.LightningModule"):
         if self.ema_initialized and self.evaluate_ema_weights_instead:
             self.restore_original_weights(pl_module)
 
-    def on_test_start(self, trainer: "pl.Trainer", pl_module: "pl.LightningModule") -> None:
+    def on_test_start(self, trainer: "pl.Trainer", pl_module: "pl.LightningModule"):
         if self.ema_initialized and self.evaluate_ema_weights_instead:
             self.replace_model_weights(pl_module)
 
-    def on_test_end(self, trainer: "pl.Trainer", pl_module: "pl.LightningModule") -> None:
+    def on_test_end(self, trainer: "pl.Trainer", pl_module: "pl.LightningModule"):
         if self.ema_initialized and self.evaluate_ema_weights_instead:
             self.restore_original_weights(pl_module)
 
 
-# TODO breaks when task_name contains metric_map keys
 class EMAModelCheckpoint(ModelCheckpoint):
     """Light wrapper around Lightning's `ModelCheckpoint` to, upon request, save an EMA copy of the
     model as well. Should only be used with `EMACallback`. Should only work for trainings with a
@@ -186,14 +185,14 @@ class EMAModelCheckpoint(ModelCheckpoint):
         self.model_parallel_size_ema = None
         self.last_model_path_ema = ""
 
-    def _get_ema_callback(self, trainer: "pl.Trainer") -> Optional[EMA]:
+    def _get_ema_callback(self, trainer: "pl.Trainer"):
         ema_callback = None
         for callback in trainer.callbacks:
             if isinstance(callback, EMA):
                 ema_callback = callback
         return ema_callback
 
-    def _save_checkpoint(self, trainer: "pl.Trainer", filepath: str) -> None:
+    def _save_checkpoint(self, trainer: "pl.Trainer", filepath: str) :
         super()._save_checkpoint(trainer, filepath)
         ema_callback = self._get_ema_callback(trainer)
         if ema_callback is not None:
@@ -209,7 +208,7 @@ class EMAModelCheckpoint(ModelCheckpoint):
             if self.save_top_k != -1:
                 self.topk_check_ema()
 
-    def _ema_format_filepath(self, filepath: str) -> str:
+    def _ema_format_filepath(self, filepath: str):
         return filepath.replace(self.FILE_EXTENSION, f"-EMA{self.FILE_EXTENSION}")
 
     def topk_check_ema(self):
@@ -267,7 +266,7 @@ class EMAModelCheckpoint(ModelCheckpoint):
         self.best_model_path_ema = best_k_models_ema[0]
         self.best_model_score_ema = self.best_k_models_ema[self.best_model_path_ema]
 
-    def _del_model_without_trainer(self, filepath: str) -> None:
+    def _del_model_without_trainer(self, filepath: str):
         try:
             self._fs.rm(filepath)
 
