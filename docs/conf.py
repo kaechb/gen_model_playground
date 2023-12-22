@@ -60,7 +60,8 @@ MOCK_MODULES = [
     "lightning.pytorch.callbacks",
     "lightning.pytorch.utilities",
     "ightning.pytorch.utilities.exceptions",
-    "ightning.pytorch.utilities.types"
+    "ightning.pytorch.utilities.types",
+    "lightning.pytorch.loggers"
 
 
 ]
