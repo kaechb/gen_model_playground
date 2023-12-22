@@ -19,6 +19,6 @@ module purge
 module load maxwell gcc/9.3
 module load anaconda3/5.2
 . conda-init
-conda activate <gen_model_playground environment>
+conda activate <gen_model_playground_environment>
 cd <path-to-your-project>
 python __main__.py --name gan #add args here
