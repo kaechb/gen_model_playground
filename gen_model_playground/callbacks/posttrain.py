@@ -134,9 +134,8 @@ class PostTrainingCallback(Callback):
                 x, y = batch
                 with torch.no_grad():
                     z = torch.normal(0, 1, size=(x.shape[0], 2), device=best_model.device)
-                    if pl_module.name.find("ae")>-1:
-                        z = torch.normal(0,1, size=(x.shape[0], pl_module.hparams.encoding_dim), device=best_model.device)
-                    cond = torch.cat((torch.ones_like(z[:len(z)//2, 0]).reshape(-1, 1), torch.zeros_like(z[:len(z)//2, 0]).reshape(-1, 1)), dim=0) if pl_module.hparams.cond_features > 0 else None
+                    if pl_module.save_name.find("matching")>-1:
+                        xhat,z = best_model.sample(z, return_latent=True)
 
                     xhat = best_model.sample(z,cond=cond)
                 x = x.to(best_model.device)

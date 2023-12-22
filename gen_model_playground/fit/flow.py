@@ -73,29 +73,18 @@ class Flow(pl.LightningModule):
         """
         return self.flow.sample(x.shape[0] if cond is None else 1, context=cond)
 
-    def sample(self, batch, cond=None, t_stop=1, return_latent=False):
+    def sample(self, x, cond=None):
         """
         Samples from the flow model.
 
         Args:
-            batch: Batch size.
+            num_samples: Number of samples to generate.
             cond: Conditional inputs.
-            t_stop: Time parameter, unused in this context.
-            return_latent: Flag to return latent space variables.
 
         Returns:
-            Sampled output and optionally latent space variables.
+            Sampled output.
         """
-        with torch.no_grad():
-            x0 = torch.randn(len(batch), self.hparams.in_features).to(self.device)
-            if cond is not None:
-                z = self.flow.sample(1, context=cond).squeeze(1)
-            else:
-                z = self.flow.sample(len(batch), context=cond)
-            if return_latent:
-                return z, x0
-            else:
-                return z
+        return self.flow.sample(x.shape[0], context=cond)
     def on_validation_epoch_start(self):
         """
         Prepares variables for tracking during the validation epoch.

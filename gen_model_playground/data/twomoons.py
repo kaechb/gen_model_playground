@@ -53,9 +53,9 @@ class TwoMoonsDataModule(pl.LightningDataModule):
         X, y = torch.from_numpy(X).float(), torch.from_numpy(y).float()
         # Normalize the dataset
         self.mu, self.std = X.mean(axis=0), X.std(axis=0)
-        self._min, self._max = X.min(axis=0), X.max(axis=0)
         X = (X - self.mu) / self.std
-        self.scaled_min, self.scaled_max = X.min(axis=0), X.max(axis=0)
+        self._min, self._max = X.min(axis=0), X.max(axis=0)
+
         self.dataset = TensorDataset(X, y)
 
     def train_dataloader(self):
