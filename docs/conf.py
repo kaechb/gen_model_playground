@@ -45,6 +45,8 @@ MOCK_MODULES = [
     "torchmetrics",
     "pl_bolts",
     "pl_bolts.optimizers.lr_scheduler",
+    "torchdyn.core",
+    "torchdyn.models",
 
 
 
