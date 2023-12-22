@@ -30,6 +30,8 @@ MOCK_MODULES = [
     "matplotlib.pyplot",
     "matplotlib.colors",
     "numpy",
+    "scipy",
+    "scipy.stats",
     "torch",
     "torch.nn",
     "torch.nn.utils",
