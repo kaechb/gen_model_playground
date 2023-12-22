@@ -39,9 +39,12 @@ MOCK_MODULES = [
     "sklearn.datasets",
     "torch.optim",
     "lightning",
+    "lightning.pytorch",
     "torchdyn",
     "torchcfm",
-    "torchmetrics"
+    "torchmetrics",
+
+
 
 ]
 for mod_name in MOCK_MODULES:
