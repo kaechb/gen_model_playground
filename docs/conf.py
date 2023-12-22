@@ -43,7 +43,8 @@ MOCK_MODULES = [
     "torchdyn",
     "torchcfm",
     "torchmetrics",
-    "pl_bolts"
+    "pl_bolts",
+    "pl_bolts.optimizers"
 
 
 
