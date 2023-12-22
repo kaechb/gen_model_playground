@@ -54,7 +54,8 @@ MOCK_MODULES = [
     "nflows.transforms.coupling",
     "nflows",
     "torch.nn.utils.parametrizations",
-    "torch.distributions"
+    "torch.distributions",
+    "torchcfm.conditional_flow_matching"
 
 
 ]
