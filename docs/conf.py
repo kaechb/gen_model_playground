@@ -56,7 +56,8 @@ MOCK_MODULES = [
     "torch.nn.utils.parametrizations",
     "torch.distributions",
     "torchcfm.conditional_flow_matching",
-    "lightning.pytorch"
+    "lightning.pytorch",
+    "lightning.pytorch.callbacks"
 
 
 ]
