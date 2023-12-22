@@ -11,7 +11,7 @@ from lightning.pytorch import Callback
 from lightning.pytorch.callbacks import ModelCheckpoint
 from lightning.pytorch.utilities import rank_zero_info
 from lightning.pytorch.utilities.exceptions import MisconfigurationException
-from lightning.pytorch.utilities.types import STEP_OUTPUT
+
 
 
 
@@ -85,7 +85,7 @@ class EMA(Callback):
         self,
         trainer: "pl.Trainer",
         pl_module: "pl.LightningModule",
-        outputs: STEP_OUTPUT,
+        outputs: pl.utilities.types.STEP_OUTPUT,
         batch: Any,
         batch_idx: int,
     ) -> None:
