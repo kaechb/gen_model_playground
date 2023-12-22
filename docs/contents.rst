@@ -17,10 +17,10 @@ Contents
    :caption: Modules
 
    fit
-..    utils
-..    callbacks
-..    data
-..    models
+   utils
+   callbacks
+   data
+   models
 
 
 Indices and tables

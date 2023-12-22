@@ -1,5 +1,5 @@
 ===========
-Processing
+Fit
 ===========
 .. automodule:: gen_model_playground.fit
   :members:

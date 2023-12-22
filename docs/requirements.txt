@@ -3,3 +3,7 @@ sphinx-rtd-theme==1.2.2
 autodocsumm==0.2.11
 readthedocs-sphinx-search==0.3.1
 mock
+sphinx_rtd_theme
+# torch
+# scikit-learn
+# lightning

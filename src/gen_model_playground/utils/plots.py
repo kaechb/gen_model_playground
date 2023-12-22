@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import torch
 from matplotlib.colors import LinearSegmentedColormap
-from sklearn.datasets import make_moons
+
 
 def plot(zhat, z, name=""):
     """
@@ -42,7 +42,6 @@ def plot_series(z, name="", bins=(100, 100)):
     """
     n = len(z)
     fig, ax = plt.subplots(1, n, figsize=(n * 6.4, 6.4))
-    x = make_moons(len(z), noise=0.05)[0]
     for i in range(n - 1):
         _, xx, yy, _ = ax[i].hist2d(z[i][:, 0].cpu().numpy(), z[i][:, 1].cpu().numpy(), bins=bins)
         ax[i].axis("off")

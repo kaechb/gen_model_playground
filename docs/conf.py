@@ -22,24 +22,28 @@ import sys
 
 sys.path.insert(0, os.path.abspath("../src"))
 
-autodoc_mock_imports = {
-    "torch",
-    "tqdm",
-    "numpy",
-    "scipy",
-}
 
 import mock
 
-MOCK_MODULES = {
-    "numpy",
-    "scipy",
+MOCK_MODULES = [
     "matplotlib",
     "matplotlib.pyplot",
-    "scipy",
+    "matplotlib.colors",
+    "numpy",
+    "torch",
+    "torch.nn",
+    "torch.nn.functional",
+    "torch.utils",
+    "torch.utils.data",
+    "sklearn",
+    "sklearn.datasets",
+    "torch.optim",
+    "lightning",
     "torchdyn",
     "torchcfm",
-} | autodoc_mock_imports
+    "torchmetrics"
+
+]
 for mod_name in MOCK_MODULES:
     sys.modules[mod_name] = mock.Mock()
 
@@ -163,7 +167,7 @@ latex_elements = {
 # (source start file, target name, title, author, documentclass
 # [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, "gen_model_playground.tex", "gen_model_playground Documentation", "mova", "manual"),
+    (master_doc, "gen_model_playground.tex", "gen_model_playground Documentation", "kaechb", "manual"),
 ]
 
 
