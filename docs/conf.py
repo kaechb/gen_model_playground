@@ -48,7 +48,11 @@ MOCK_MODULES = [
     "pl_bolts.optimizers.lr_scheduler",
     "torchdyn.core",
     "torchdyn.models",
-
+    "nflows.flows.base",
+    "nflows.utils.torchutils",
+    "nflows.transforms.base",
+    "nflows.transforms.coupling",
+    "nflows"
 
 
 ]
