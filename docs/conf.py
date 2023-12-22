@@ -38,7 +38,8 @@ MOCK_MODULES = {
     "matplotlib.pyplot",
     "scipy",
     "torchdyn",
-    "torchcfm"
+    "torchcfm",
+    "gen_model_playground",
 } | autodoc_mock_imports
 for mod_name in MOCK_MODULES:
     sys.modules[mod_name] = mock.Mock()
