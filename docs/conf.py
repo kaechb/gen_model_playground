@@ -52,7 +52,8 @@ MOCK_MODULES = [
     "nflows.utils.torchutils",
     "nflows.transforms.base",
     "nflows.transforms.coupling",
-    "nflows"
+    "nflows",
+    "torch.nn.utils.parametrizations"
 
 
 ]
