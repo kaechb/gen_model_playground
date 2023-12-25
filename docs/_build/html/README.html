@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Features &mdash; gen_model_playground 0.0.1 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/rtd_sphinx_search.min.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+        <script src="_static/js/rtd_search_config.js"></script>
+        <script src="_static/js/rtd_sphinx_search.min.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="contents.html" class="icon icon-home">
+            gen_model_playground
+          </a>
+              <div class="version">
+                0.0.1
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="index.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index.html#usage">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index.html#contributing">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index.html#license">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="authors.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="history.html">History</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Modules</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="utils.html">Utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="models.html">Processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fit.html">Fit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="callbacks.html">Callbacks</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="contents.html">gen_model_playground</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="contents.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Features</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/README.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="features">
+<h1>Features<a class="headerlink" href="#features" title="Permalink to this heading">¶</a></h1>
+<ul class="simple">
+<li><p>Template code for various generative models such as GANs, VAEs, etc.</p></li>
+<li><p>Easy-to-modify structures for quick customization and experimentation.</p></li>
+<li><p>Ideal for educational purposes and prototyping new generative model ideas.</p></li>
+</ul>
+</section>
+<section id="usage">
+<h1>Usage<a class="headerlink" href="#usage" title="Permalink to this heading">¶</a></h1>
+<p><code class="docutils literal notranslate"><span class="pre">gen_model_toys</span></code> serves as a template for creating and modifying generative models. It contains GANs, VAE, Discrete NF, Flow Matching, Continuous NF, DDPM.
+Check the <code class="docutils literal notranslate"><span class="pre">__main__.py</span></code> file for the possible argument configurations.
+So in the end run <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">gen_model_playground</span> <span class="pre">--{args}</span></code> to run the code, e.g. <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">gen_model_playground</span></code>.
+Please refer to the documentation within each model template for specific modification tips and best practices.</p>
+</section>
+<section id="contributing">
+<h1>Contributing<a class="headerlink" href="#contributing" title="Permalink to this heading">¶</a></h1>
+<p>If you have suggestions for additional templates or improvements, contributions are welcome!</p>
+</section>
+<section id="license">
+<h1>License<a class="headerlink" href="#license" title="Permalink to this heading">¶</a></h1>
+<p>This project is licensed under the MIT License. See the <a class="reference external" href="LICENSE">LICENSE</a> file for more details.</p>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, kaechb.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

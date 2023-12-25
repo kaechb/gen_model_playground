@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Utils &mdash; gen_model_playground 0.0.1 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/rtd_sphinx_search.min.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+        <script src="_static/js/rtd_search_config.js"></script>
+        <script src="_static/js/rtd_sphinx_search.min.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Processing" href="models.html" />
+    <link rel="prev" title="History" href="history.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="contents.html" class="icon icon-home">
+            gen_model_playground
+          </a>
+              <div class="version">
+                0.0.1
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="index.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index.html#usage">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index.html#contributing">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index.html#license">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="authors.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="history.html">History</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Modules</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Utils</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#gen_model_playground.utils.gradient_penalty"><code class="docutils literal notranslate"><span class="pre">gradient_penalty()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#gen_model_playground.utils.least_squares"><code class="docutils literal notranslate"><span class="pre">least_squares()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#gen_model_playground.utils.non_saturating"><code class="docutils literal notranslate"><span class="pre">non_saturating()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#gen_model_playground.utils.plot"><code class="docutils literal notranslate"><span class="pre">plot()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#gen_model_playground.utils.plot_latent"><code class="docutils literal notranslate"><span class="pre">plot_latent()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#gen_model_playground.utils.plot_logprob"><code class="docutils literal notranslate"><span class="pre">plot_logprob()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#gen_model_playground.utils.plot_series"><code class="docutils literal notranslate"><span class="pre">plot_series()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#gen_model_playground.utils.wasserstein"><code class="docutils literal notranslate"><span class="pre">wasserstein()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="models.html">Processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fit.html">Fit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="callbacks.html">Callbacks</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="contents.html">gen_model_playground</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="contents.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Utils</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/utils.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-gen_model_playground.utils">
+<span id="utils"></span><h1>Utils<a class="headerlink" href="#module-gen_model_playground.utils" title="Permalink to this heading">¶</a></h1>
+<p><strong>Functions:</strong></p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gen_model_playground.utils.gradient_penalty" title="gen_model_playground.utils.gradient_penalty"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gradient_penalty</span></code></a>(x, fake, discriminator)</p></td>
+<td><p>Calculates the gradient penalty for the discriminator in WGANs, enforcing the Lipschitz constraint.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#gen_model_playground.utils.least_squares" title="gen_model_playground.utils.least_squares"><code class="xref py py-obj docutils literal notranslate"><span class="pre">least_squares</span></code></a>(y_real, y_fake, critic)</p></td>
+<td><p>Implements the Least Squares GAN (LSGAN) loss function.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gen_model_playground.utils.non_saturating" title="gen_model_playground.utils.non_saturating"><code class="xref py py-obj docutils literal notranslate"><span class="pre">non_saturating</span></code></a>(y_real, y_fake, critic)</p></td>
+<td><p>Computes the Non-Saturating GAN loss using binary cross-entropy.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#gen_model_playground.utils.plot" title="gen_model_playground.utils.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a>(zhat, z[, name])</p></td>
+<td><p>Plots a 2D histogram comparing two sets of data points.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gen_model_playground.utils.plot_latent" title="gen_model_playground.utils.plot_latent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_latent</span></code></a>(z, z2[, name])</p></td>
+<td><p>Plots two overlapping 2D histograms of data points in latent space, useful for visualizing distributions.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#gen_model_playground.utils.plot_logprob" title="gen_model_playground.utils.plot_logprob"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_logprob</span></code></a>(x, y, z)</p></td>
+<td><p>Plots logarithmic probabilities on a 2D grid.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gen_model_playground.utils.plot_series" title="gen_model_playground.utils.plot_series"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_series</span></code></a>(z[, name, bins])</p></td>
+<td><p>Plots a series of 2D histograms for a sequence of data points.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#gen_model_playground.utils.wasserstein" title="gen_model_playground.utils.wasserstein"><code class="xref py py-obj docutils literal notranslate"><span class="pre">wasserstein</span></code></a>(y_real, y_fake, critic)</p></td>
+<td><p>Calculates the Wasserstein loss, used in Wasserstein GANs (WGANs).</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py function">
+<dt class="sig sig-object py" id="gen_model_playground.utils.gradient_penalty">
+<span class="sig-prename descclassname"><span class="pre">gen_model_playground.utils.</span></span><span class="sig-name descname"><span class="pre">gradient_penalty</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fake</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">discriminator</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gen_model_playground/utils/losses.html#gradient_penalty"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gen_model_playground.utils.gradient_penalty" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the gradient penalty for the discriminator in WGANs, enforcing the Lipschitz constraint.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>x (torch.Tensor): Real data.
+fake (torch.Tensor): Fake data generated by the generator.
+discriminator (nn.Module): The discriminator network.</p>
+</dd>
+<dt>Returns:</dt><dd><p>torch.Tensor: The calculated gradient penalty.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="gen_model_playground.utils.least_squares">
+<span class="sig-prename descclassname"><span class="pre">gen_model_playground.utils.</span></span><span class="sig-name descname"><span class="pre">least_squares</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y_real</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_fake</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">critic</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gen_model_playground/utils/losses.html#least_squares"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gen_model_playground.utils.least_squares" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implements the Least Squares GAN (LSGAN) loss function.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>y_real (torch.Tensor): Discriminator output for real data.
+y_fake (torch.Tensor): Discriminator output for fake data.
+critic (bool): Indicates if the function is used for the discriminator (True) or generator (False).</p>
+</dd>
+<dt>Returns:</dt><dd><p>torch.Tensor: The calculated loss value.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="gen_model_playground.utils.non_saturating">
+<span class="sig-prename descclassname"><span class="pre">gen_model_playground.utils.</span></span><span class="sig-name descname"><span class="pre">non_saturating</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y_real</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_fake</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">critic</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gen_model_playground/utils/losses.html#non_saturating"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gen_model_playground.utils.non_saturating" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes the Non-Saturating GAN loss using binary cross-entropy.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>y_real (torch.Tensor): Discriminator output for real data.
+y_fake (torch.Tensor): Discriminator output for fake data.
+critic (bool): Indicates if the function is used for the discriminator (True) or generator (False).</p>
+</dd>
+<dt>Returns:</dt><dd><p>torch.Tensor: The calculated loss value.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="gen_model_playground.utils.plot">
+<span class="sig-prename descclassname"><span class="pre">gen_model_playground.utils.</span></span><span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">zhat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gen_model_playground/utils/plots.html#plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gen_model_playground.utils.plot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plots a 2D histogram comparing two sets of data points.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>zhat (array-like): The first set of 2D points to be plotted.
+z (array-like): The second set of 2D points to be plotted.
+name (str, optional): Title for the plot.</p>
+</dd>
+<dt>Returns:</dt><dd><p>matplotlib.figure.Figure, matplotlib.axes.Axes: The figure and axes objects of the plot.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="gen_model_playground.utils.plot_latent">
+<span class="sig-prename descclassname"><span class="pre">gen_model_playground.utils.</span></span><span class="sig-name descname"><span class="pre">plot_latent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'latent.pdf'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gen_model_playground/utils/plots.html#plot_latent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gen_model_playground.utils.plot_latent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plots two overlapping 2D histograms of data points in latent space, useful for visualizing distributions.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>z (array-like): 2D data points representing the first set in latent space.
+z2 (array-like, optional): 2D data points representing the second set in latent space.
+name (str, optional): Filename for saving the plot.</p>
+</dd>
+<dt>Returns:</dt><dd><p>matplotlib.figure.Figure, matplotlib.axes.Axes: The figure and axes objects of the plot.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="gen_model_playground.utils.plot_logprob">
+<span class="sig-prename descclassname"><span class="pre">gen_model_playground.utils.</span></span><span class="sig-name descname"><span class="pre">plot_logprob</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gen_model_playground/utils/plots.html#plot_logprob"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gen_model_playground.utils.plot_logprob" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plots logarithmic probabilities on a 2D grid.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>x (array-like): 1D array representing the x-coordinates of the grid.
+y (array-like): 1D array representing the y-coordinates of the grid.
+z (array-like): 2D array representing the probabilities at each grid point.</p>
+</dd>
+<dt>Returns:</dt><dd><p>Tuple of figures and axes objects for the normal and logarithmic plots.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="gen_model_playground.utils.plot_series">
+<span class="sig-prename descclassname"><span class="pre">gen_model_playground.utils.</span></span><span class="sig-name descname"><span class="pre">plot_series</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(100,</span> <span class="pre">100)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gen_model_playground/utils/plots.html#plot_series"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gen_model_playground.utils.plot_series" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plots a series of 2D histograms for a sequence of data points.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>z (list of array-like): A sequence of 2D data points to be plotted.
+name (str, optional): Title for the plot.
+bins (tuple, optional): The bin size for the histograms. Default is (100, 100).</p>
+</dd>
+<dt>Returns:</dt><dd><p>matplotlib.figure.Figure, matplotlib.axes.Axes: The figure and axes objects of the plot.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="gen_model_playground.utils.wasserstein">
+<span class="sig-prename descclassname"><span class="pre">gen_model_playground.utils.</span></span><span class="sig-name descname"><span class="pre">wasserstein</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y_real</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_fake</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">critic</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/gen_model_playground/utils/losses.html#wasserstein"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gen_model_playground.utils.wasserstein" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the Wasserstein loss, used in Wasserstein GANs (WGANs).</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>y_real (torch.Tensor): Discriminator output for real data.
+y_fake (torch.Tensor): Discriminator output for fake data.
+critic (bool): Indicates if the function is used for the discriminator (True) or generator (False).</p>
+</dd>
+<dt>Returns:</dt><dd><p>torch.Tensor: The calculated loss value.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="history.html" class="btn btn-neutral float-left" title="History" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="models.html" class="btn btn-neutral float-right" title="Processing" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, kaechb.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

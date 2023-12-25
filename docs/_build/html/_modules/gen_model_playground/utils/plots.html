@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>gen_model_playground.utils.plots &mdash; gen_model_playground 0.0.1 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/rtd_sphinx_search.min.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+        <script src="../../../_static/js/rtd_search_config.js"></script>
+        <script src="../../../_static/js/rtd_sphinx_search.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../contents.html" class="icon icon-home">
+            gen_model_playground
+          </a>
+              <div class="version">
+                0.0.1
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html#usage">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html#contributing">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html#license">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../authors.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../history.html">History</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Modules</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../utils.html">Utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../models.html">Processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../fit.html">Fit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../callbacks.html">Callbacks</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../contents.html">gen_model_playground</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../contents.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">gen_model_playground.utils.plots</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for gen_model_playground.utils.plots</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">matplotlib</span> <span class="k">as</span> <span class="nn">mpl</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">from</span> <span class="nn">matplotlib.colors</span> <span class="kn">import</span> <span class="n">LinearSegmentedColormap</span>
+
+
+<div class="viewcode-block" id="plot"><a class="viewcode-back" href="../../../utils.html#gen_model_playground.utils.plot">[docs]</a><span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="n">zhat</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Plots a 2D histogram comparing two sets of data points.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        zhat (array-like): The first set of 2D points to be plotted.</span>
+<span class="sd">        z (array-like): The second set of 2D points to be plotted.</span>
+<span class="sd">        name (str, optional): Title for the plot.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        matplotlib.figure.Figure, matplotlib.axes.Axes: The figure and axes objects of the plot.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mf">6.4</span><span class="p">,</span> <span class="mf">6.4</span><span class="p">))</span>
+    <span class="n">cmap</span> <span class="o">=</span> <span class="n">LinearSegmentedColormap</span><span class="o">.</span><span class="n">from_list</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;white&quot;</span><span class="p">,</span> <span class="o">*</span><span class="n">plt</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">Blues</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">255</span><span class="p">))])</span>
+
+    <span class="n">_</span><span class="p">,</span> <span class="n">xx</span><span class="p">,</span> <span class="n">yy</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">hist2d</span><span class="p">(</span><span class="n">z</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">z</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">bins</span><span class="o">=</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">),</span> <span class="n">density</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mf">6.4</span><span class="p">,</span> <span class="mf">6.4</span><span class="p">))</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">hist2d</span><span class="p">(</span><span class="n">zhat</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">zhat</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">bins</span><span class="o">=</span><span class="p">(</span><span class="n">xx</span><span class="p">,</span> <span class="n">yy</span><span class="p">),</span> <span class="n">density</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span></div>
+
+<div class="viewcode-block" id="plot_series"><a class="viewcode-back" href="../../../utils.html#gen_model_playground.utils.plot_series">[docs]</a><span class="k">def</span> <span class="nf">plot_series</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">)):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Plots a series of 2D histograms for a sequence of data points.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        z (list of array-like): A sequence of 2D data points to be plotted.</span>
+<span class="sd">        name (str, optional): Title for the plot.</span>
+<span class="sd">        bins (tuple, optional): The bin size for the histograms. Default is (100, 100).</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        matplotlib.figure.Figure, matplotlib.axes.Axes: The figure and axes objects of the plot.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="n">n</span> <span class="o">*</span> <span class="mf">6.4</span><span class="p">,</span> <span class="mf">6.4</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">xx</span><span class="p">,</span> <span class="n">yy</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">ax</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">hist2d</span><span class="p">(</span><span class="n">z</span><span class="p">[</span><span class="n">i</span><span class="p">][:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span> <span class="n">z</span><span class="p">[</span><span class="n">i</span><span class="p">][:,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span> <span class="n">bins</span><span class="o">=</span><span class="n">bins</span><span class="p">)</span>
+        <span class="n">ax</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">xx</span><span class="p">,</span> <span class="n">yy</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">ax</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">hist2d</span><span class="p">(</span><span class="n">z</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span> <span class="n">z</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][:,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span> <span class="n">bins</span><span class="o">=</span><span class="n">bins</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span></div>
+
+
+<div class="viewcode-block" id="plot_latent"><a class="viewcode-back" href="../../../utils.html#gen_model_playground.utils.plot_latent">[docs]</a><span class="k">def</span> <span class="nf">plot_latent</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">z2</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;latent.pdf&quot;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Plots two overlapping 2D histograms of data points in latent space, useful for visualizing distributions.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        z (array-like): 2D data points representing the first set in latent space.</span>
+<span class="sd">        z2 (array-like, optional): 2D data points representing the second set in latent space.</span>
+<span class="sd">        name (str, optional): Filename for saving the plot.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        matplotlib.figure.Figure, matplotlib.axes.Axes: The figure and axes objects of the plot.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mf">6.4</span><span class="p">,</span> <span class="mf">6.4</span><span class="p">))</span>
+    <span class="n">cmap_red</span> <span class="o">=</span> <span class="n">LinearSegmentedColormap</span><span class="o">.</span><span class="n">from_list</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;white&quot;</span><span class="p">,</span> <span class="s2">&quot;#EC3D5D&quot;</span><span class="p">])</span>
+    <span class="n">cmap_blue</span> <span class="o">=</span> <span class="n">LinearSegmentedColormap</span><span class="o">.</span><span class="n">from_list</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;white&quot;</span><span class="p">,</span> <span class="s2">&quot;#3D5DEC&quot;</span><span class="p">])</span>
+    <span class="c1"># Define the binning for the histograms</span>
+    <span class="n">x</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">((</span><span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">z</span><span class="p">),</span><span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">z2</span><span class="p">)),</span><span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+    <span class="n">bins</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">x</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">x</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span> <span class="mi">100</span><span class="p">),</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">x</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">x</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span> <span class="mi">100</span><span class="p">)]</span>
+
+
+
+    <span class="c1"># Plot the first histogram</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">hist2d</span><span class="p">(</span><span class="n">z</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">z</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">bins</span><span class="o">=</span><span class="n">bins</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap_blue</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Lower Moon&quot;</span><span class="p">,</span><span class="n">density</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">vmin</span><span class="o">=</span><span class="mf">0.01</span><span class="p">)</span>
+
+
+    <span class="c1"># Plot the second histogram if it exists</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">hist2d</span><span class="p">(</span><span class="n">z2</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">z2</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">bins</span><span class="o">=</span><span class="n">bins</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap_red</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>  <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Upper Moon&quot;</span><span class="p">,</span><span class="n">density</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">vmin</span><span class="o">=</span><span class="mf">0.01</span><span class="p">)</span>
+
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span></div>
+
+<div class="viewcode-block" id="plot_logprob"><a class="viewcode-back" href="../../../utils.html#gen_model_playground.utils.plot_logprob">[docs]</a><span class="k">def</span> <span class="nf">plot_logprob</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Plots logarithmic probabilities on a 2D grid.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        x (array-like): 1D array representing the x-coordinates of the grid.</span>
+<span class="sd">        y (array-like): 1D array representing the y-coordinates of the grid.</span>
+<span class="sd">        z (array-like): 2D array representing the probabilities at each grid point.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Tuple of figures and axes objects for the normal and logarithmic plots.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+    <span class="n">cmap</span> <span class="o">=</span> <span class="n">LinearSegmentedColormap</span><span class="o">.</span><span class="n">from_list</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;white&quot;</span><span class="p">,</span> <span class="o">*</span><span class="n">plt</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">Blues</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">255</span><span class="p">))])</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">pcolor</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span>  <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="n">logfig</span><span class="p">,</span> <span class="n">logax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">pcolor</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="n">mpl</span><span class="o">.</span><span class="n">colors</span><span class="o">.</span><span class="n">LogNorm</span><span class="p">(),</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span><span class="p">,</span> <span class="n">logfig</span><span class="p">,</span> <span class="n">logax</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, kaechb.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

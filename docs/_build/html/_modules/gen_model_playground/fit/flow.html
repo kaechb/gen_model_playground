@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>gen_model_playground.fit.flow &mdash; gen_model_playground 0.0.1 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/rtd_sphinx_search.min.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+        <script src="../../../_static/js/rtd_search_config.js"></script>
+        <script src="../../../_static/js/rtd_sphinx_search.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../contents.html" class="icon icon-home">
+            gen_model_playground
+          </a>
+              <div class="version">
+                0.0.1
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html#usage">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html#contributing">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html#license">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../authors.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../history.html">History</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Modules</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../utils.html">Utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../models.html">Processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../fit.html">Fit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../callbacks.html">Callbacks</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../contents.html">gen_model_playground</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../contents.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">gen_model_playground.fit.flow</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for gen_model_playground.fit.flow</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">nflows.flows.base</span> <span class="kn">import</span> <span class="n">Flow</span> <span class="k">as</span> <span class="n">BaseFlow</span>
+<span class="kn">from</span> <span class="nn">nflows.utils.torchutils</span> <span class="kn">import</span> <span class="n">create_random_binary_mask</span>
+<span class="kn">from</span> <span class="nn">nflows.transforms.base</span> <span class="kn">import</span> <span class="n">CompositeTransform</span>
+<span class="kn">from</span> <span class="nn">nflows.transforms.coupling</span> <span class="kn">import</span> <span class="n">PiecewiseRationalQuadraticCouplingTransform</span><span class="p">,</span> <span class="n">AffineCouplingTransform</span>
+<span class="kn">import</span> <span class="nn">nflows</span> <span class="k">as</span> <span class="nn">nf</span>
+<span class="kn">from</span> <span class="nn">gen_model_playground.models.model</span> <span class="kn">import</span> <span class="n">Model</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">lightning.pytorch</span> <span class="k">as</span> <span class="nn">pl</span>
+<span class="kn">from</span> <span class="nn">pl_bolts.optimizers.lr_scheduler</span> <span class="kn">import</span> <span class="n">LinearWarmupCosineAnnealingLR</span>
+
+<div class="viewcode-block" id="Flow"><a class="viewcode-back" href="../../../fit.html#gen_model_playground.fit.Flow">[docs]</a><span class="k">class</span> <span class="nc">Flow</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">LightningModule</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    PyTorch Lightning module for flow-based models.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        flow: The constructed flow model.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes the Flow model with specified hyperparameters.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save_hyperparameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hparams</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&quot;_&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">hparams</span><span class="o">.</span><span class="n">flow_type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">flow</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">construct_flow</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">automatic_optimization</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># Disable automatic optimization</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hparams</span><span class="o">.</span><span class="n">name</span>
+
+<div class="viewcode-block" id="Flow.construct_flow"><a class="viewcode-back" href="../../../fit.html#gen_model_playground.fit.Flow.construct_flow">[docs]</a>    <span class="k">def</span> <span class="nf">construct_flow</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructs a flow model based on the specified hyperparameters.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            The constructed flow model.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">flows</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hparams</span><span class="o">.</span><span class="n">ncoupling</span><span class="p">):</span>
+            <span class="n">mask</span> <span class="o">=</span> <span class="n">create_random_binary_mask</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hparams</span><span class="o">.</span><span class="n">in_features</span><span class="p">)</span>
+            <span class="n">layer_networks</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Model</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">hidden_features</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hparams</span><span class="o">.</span><span class="n">hidden_features</span><span class="p">,</span> <span class="n">cond_features</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hparams</span><span class="o">.</span><span class="n">cond_features</span><span class="p">,</span> <span class="n">num_blocks</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hparams</span><span class="o">.</span><span class="n">num_blocks</span><span class="p">,</span> <span class="n">spectral</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hparams</span><span class="o">.</span><span class="n">spectral</span><span class="p">,</span> <span class="n">batch_norm</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hparams</span><span class="o">.</span><span class="n">batch_norm</span><span class="p">,</span> <span class="n">residual</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hparams</span><span class="o">.</span><span class="n">residual</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">hparams</span><span class="o">.</span><span class="n">flow_type</span> <span class="o">!=</span> <span class="s2">&quot;affine&quot;</span><span class="p">:</span>
+                <span class="n">flows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">PiecewiseRationalQuadraticCouplingTransform</span><span class="p">(</span><span class="n">mask</span><span class="o">=</span><span class="n">mask</span><span class="p">,</span> <span class="n">transform_net_create_fn</span><span class="o">=</span><span class="n">layer_networks</span><span class="p">,</span> <span class="n">tails</span><span class="o">=</span><span class="s1">&#39;linear&#39;</span><span class="p">,</span> <span class="n">tail_bound</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hparams</span><span class="o">.</span><span class="n">tail_bound</span><span class="p">,</span> <span class="n">num_bins</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hparams</span><span class="o">.</span><span class="n">num_bins</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">flows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">AffineCouplingTransform</span><span class="p">(</span><span class="n">mask</span><span class="o">=</span><span class="n">mask</span><span class="p">,</span> <span class="n">transform_net_create_fn</span><span class="o">=</span><span class="n">layer_networks</span><span class="p">))</span>
+        <span class="n">q0</span> <span class="o">=</span> <span class="n">nf</span><span class="o">.</span><span class="n">distributions</span><span class="o">.</span><span class="n">normal</span><span class="o">.</span><span class="n">StandardNormal</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">hparams</span><span class="o">.</span><span class="n">in_features</span><span class="p">])</span>
+        <span class="n">flows</span> <span class="o">=</span> <span class="n">CompositeTransform</span><span class="p">(</span><span class="n">flows</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">BaseFlow</span><span class="p">(</span><span class="n">distribution</span><span class="o">=</span><span class="n">q0</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="n">flows</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Flow.configure_optimizers"><a class="viewcode-back" href="../../../fit.html#gen_model_playground.fit.Flow.configure_optimizers">[docs]</a>    <span class="k">def</span> <span class="nf">configure_optimizers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Configures optimizers and learning rate schedulers.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A tuple of lists containing optimizers and learning rate schedulers.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hparams</span><span class="o">.</span><span class="n">lr</span><span class="p">)</span>
+        <span class="n">sched</span> <span class="o">=</span> <span class="n">LinearWarmupCosineAnnealingLR</span><span class="p">(</span><span class="n">optimizer</span><span class="p">,</span> <span class="n">warmup_epochs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hparams</span><span class="o">.</span><span class="n">max_epochs</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">hparams</span><span class="o">.</span><span class="n">num_batches</span> <span class="o">//</span> <span class="mi">10</span><span class="p">,</span> <span class="n">max_epochs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hparams</span><span class="o">.</span><span class="n">num_batches</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">hparams</span><span class="o">.</span><span class="n">max_epochs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">optimizer</span><span class="p">],</span> <span class="p">[</span><span class="n">sched</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="Flow.forward"><a class="viewcode-back" href="../../../fit.html#gen_model_playground.fit.Flow.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cond</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">feature_matching</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Forward pass through the flow model for sampling.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            x: Input tensor.</span>
+<span class="sd">            t: Time parameter, unused in this context.</span>
+<span class="sd">            cond: Conditional inputs.</span>
+<span class="sd">            feature_matching: Feature matching flag, unused in this context.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Sampled output.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">flow</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">cond</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">1</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="n">cond</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Flow.on_validation_epoch_start"><a class="viewcode-back" href="../../../fit.html#gen_model_playground.fit.Flow.on_validation_epoch_start">[docs]</a>    <span class="k">def</span> <span class="nf">on_validation_epoch_start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Prepares variables for tracking during the validation epoch.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">xhat</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">z</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prob</span> <span class="o">=</span> <span class="p">[]</span></div>
+
+<div class="viewcode-block" id="Flow.training_step"><a class="viewcode-back" href="../../../fit.html#gen_model_playground.fit.Flow.training_step">[docs]</a>    <span class="k">def</span> <span class="nf">training_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Training step for the flow model.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            batch: Input batch.</span>
+<span class="sd">            batch_idx: Batch index.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Computed loss for the training step.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">opt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizers</span><span class="p">()</span>
+        <span class="n">sched</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lr_schedulers</span><span class="p">()</span>
+        <span class="n">sched</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">batch</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">cond</span> <span class="o">=</span> <span class="n">batch</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">hparams</span><span class="o">.</span><span class="n">cond_features</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="n">log_likelihood</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">flow</span><span class="o">.</span><span class="n">log_prob</span><span class="p">(</span><span class="n">inputs</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="n">cond</span><span class="p">)</span>
+        <span class="n">opt</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
+        <span class="n">loss</span> <span class="o">=</span> <span class="o">-</span><span class="n">torch</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">log_likelihood</span><span class="p">)</span>
+        <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+        <span class="n">opt</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="s2">&quot;train/loss&quot;</span><span class="p">,</span> <span class="n">loss</span><span class="p">,</span> <span class="n">on_step</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">on_epoch</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">prog_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">loss</span></div>
+
+<div class="viewcode-block" id="Flow.validation_step"><a class="viewcode-back" href="../../../fit.html#gen_model_playground.fit.Flow.validation_step">[docs]</a>    <span class="k">def</span> <span class="nf">validation_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Validation step for the flow model.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            batch: Input batch for validation.</span>
+<span class="sd">            batch_idx: Batch index.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Computed validation loss.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">batch</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">cond</span> <span class="o">=</span> <span class="n">batch</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">hparams</span><span class="o">.</span><span class="n">cond_features</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="n">log_likelihood</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">flow</span><span class="o">.</span><span class="n">log_prob</span><span class="p">(</span><span class="n">inputs</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="n">cond</span><span class="p">)</span>
+        <span class="n">loss</span> <span class="o">=</span> <span class="o">-</span><span class="n">torch</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">log_likelihood</span><span class="p">)</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">flow</span><span class="o">.</span><span class="n">transform_to_noise</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="s2">&quot;val/loss&quot;</span><span class="p">,</span> <span class="n">loss</span><span class="p">,</span> <span class="n">on_step</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">on_epoch</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">prog_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">xhat</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">cond</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">batch</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">z</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">loss</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, kaechb.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
