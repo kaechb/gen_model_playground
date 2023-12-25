@@ -20,52 +20,13 @@
 import os
 import sys
 
-sys.path.insert(0, os.path.abspath("../src"))
+sys.path.insert(0, os.path.abspath("../"))
+
 
 
 import mock
 
 MOCK_MODULES = [
-    "matplotlib",
-    "matplotlib.pyplot",
-    "matplotlib.colors",
-    "numpy",
-    "scipy",
-    "scipy.stats",
-    "torch",
-    "torch.nn",
-    "torch.nn.utils",
-    "torch.nn.functional",
-    "torch.utils",
-    "torch.utils.data",
-    "sklearn",
-    "sklearn.datasets",
-    "torch.optim",
-    "lightning",
-    "lightning.pytorch",
-    "torchdyn",
-    "torchcfm",
-    "torchmetrics",
-    "pl_bolts",
-    "pl_bolts.optimizers.lr_scheduler",
-    "torchdyn.core",
-    "torchdyn.models",
-    "nflows.flows.base",
-    "nflows.utils.torchutils",
-    "nflows.transforms.base",
-    "nflows.transforms.coupling",
-    "nflows",
-    "torch.nn.utils.parametrizations",
-    "torch.distributions",
-    "torchcfm.conditional_flow_matching",
-    "lightning.pytorch",
-    "lightning.pytorch.callbacks",
-    "lightning.pytorch.utilities",
-    "lightning.pytorch.utilities.exceptions",
-    "lightning.pytorch.utilities.types",
-    "lightning.pytorch.loggers"
-
-
 ]
 for mod_name in MOCK_MODULES:
     sys.modules[mod_name] = mock.Mock()
@@ -137,7 +98,7 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 pygments_style = "sphinx"
 
 # If true, `todo` and `todoList` produce output, else they produce nothing.
-todo_include_todos = False
+todo_include_todos = True
 
 
 # -- Options for HTML output -------------------------------------------

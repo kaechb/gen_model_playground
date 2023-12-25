@@ -15,7 +15,7 @@ Types of Contributions
 Report Bugs
 ~~~~~~~~~~~
 
-Report bugs at https://github.com/DeGeSim/caloutils/issues.
+Report bugs at https://github.com/DeGeSim/gen_model_playground/issues.
 
 If you are reporting a bug, please include:
 
@@ -38,14 +38,14 @@ and "help wanted" is open to whoever wants to implement it.
 Write Documentation
 ~~~~~~~~~~~~~~~~~~~
 
-caloutils could always use more documentation, whether as part of the
-official caloutils docs, in docstrings, or even on the web in blog posts,
+gen_model_playground could always use more documentation, whether as part of the
+official gen_model_playground docs, in docstrings, or even on the web in blog posts,
 articles, and such.
 
 Submit Feedback
 ~~~~~~~~~~~~~~~
 
-The best way to send feedback is to file an issue at https://github.com/DeGeSim/caloutils/issues.
+The best way to send feedback is to file an issue at https://github.com/DeGeSim/gen_model_playground/issues.
 
 If you are proposing a feature:
 
@@ -57,12 +57,12 @@ If you are proposing a feature:
 Get Started!
 ------------
 
-Ready to contribute? Here's how to set up `caloutils` for local development.
+Ready to contribute? Here's how to set up `gen_model_playground` for local development.
 
-1. Fork the `caloutils` repo on GitHub.
+1. Fork the `gen_model_playground` repo on GitHub.
 2. Clone your fork locally::
 
-    $ git clone git@github.com:your_name_here/caloutils.git
+    $ git clone git@github.com:your_name_here/gen_model_playground.git
 
 3. Install your local copy into a virtualenv. Assuming you have virtualenvwrapper installed, this is how you set up your fork for local development::
 

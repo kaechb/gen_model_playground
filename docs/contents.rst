@@ -12,19 +12,18 @@ Contents
    history
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
    :name: Modules
    :caption: Modules
 
-   fit
    utils
+   models
+   fit
    callbacks
    data
-   models
 
 
 Indices and tables
 ==================
-* :ref:`genindex`
-* :ref:`modindex`
+
 * :ref:`search`
