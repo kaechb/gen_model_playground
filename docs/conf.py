@@ -30,8 +30,6 @@ MOCK_MODULES = [
     "matplotlib",
     "matplotlib.pyplot",
     "matplotlib.colors",
-    "sklearn",
-    "sklearn.datasets",
     "torchdyn",
     "torchcfm",
     "torchmetrics",
