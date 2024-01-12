@@ -26,7 +26,7 @@ sys.path.insert(0, os.path.abspath("../"))
 
 import mock
 
-MOCK_MODULES = ["pl_bolts.optimizers.lr_scheduler", "torchdyn.core", "torchcfm.conditional_flow_matching", "torchdyn.models"
+MOCK_MODULES = ["pl_bolts.optimizers.lr_scheduler"
 
 ]
 for mod_name in MOCK_MODULES:
