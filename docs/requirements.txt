@@ -8,3 +8,5 @@ torch
 numpy
 lightning
 scikit-learn
+torchdyn
+torchcfm
