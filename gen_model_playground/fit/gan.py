@@ -26,9 +26,15 @@ class GAN(pl.LightningModule):
         self.automatic_optimization = False  # Disable automatic optimization
         self.gan_type = self.hparams.gan_type
         self.loss = least_squares if self.hparams.gan_type == "lsgan" else wasserstein if self.hparams.gan_type == "wgan" else non_saturating
+
         self.spectral = self.hparams.spectral
         self.save_name = self.hparams.gan_type
-        self.name = self.hparams.name
+        self.save_name += "_spectral" if self.hparams.spectral else ""
+        self.save_name += "_gp"+str(self.hparams.gp_value) if self.hparams.gp  else ""
+        self.save_name += "_residual" if self.hparams.residual else ""
+        self.save_name += "_bn" if self.hparams.batch_norm else ""
+        self.save_name += "_ema" if self.hparams.bias_gen else ""
+        self.name = self.hparams.name if not "fm" in vars(self.hparams) else  "feature_matching" if self.hparams.fm else self.hparams.name
 
     def configure_optimizers(self):
         """
@@ -38,22 +44,26 @@ class GAN(pl.LightningModule):
             A tuple of lists containing optimizers and learning rate schedulers.
         """
         opt_g = torch.optim.Adam(self.generator.parameters(), lr=self.hparams.lr)
-        opt_d = torch.optim.Adam(self.discriminator.parameters(), lr=2 * self.hparams.lr)
+        opt_d = torch.optim.Adam(self.discriminator.parameters(), lr=2 * self.hparams.lr, betas=(0.9 if self.hparams.gan_type != "wgan" else 0.5, 0.999))
         sched_g = LinearWarmupCosineAnnealingLR(opt_g, warmup_epochs=self.hparams.max_epochs * self.hparams.num_batches // 10, max_epochs=self.hparams.max_epochs * self.hparams.num_batches)
         sched_d = LinearWarmupCosineAnnealingLR(opt_d, warmup_epochs=self.hparams.max_epochs * self.hparams.num_batches // 10, max_epochs=self.hparams.max_epochs * self.hparams.num_batches)
         return [opt_g, opt_d], [sched_g, sched_d]
 
-    def forward(self, z):
+    def sample(self, z, cond=None):
         """
-        Forward pass through the generator.
+        Samples from the generator.
 
         Args:
-            z: Input noise tensor for the generator.
+            z: Normal distributed noise
+            cond: Condition for the generator, tensor of shape (len(z),*).
 
         Returns:
-            Generated data.
+            Generated samples.
         """
-        return self.generator(z)
+
+
+        return self.generator(z, cond)
+
 
     def training_step(self, batch, batch_idx):
         """
@@ -66,21 +76,22 @@ class GAN(pl.LightningModule):
         Returns:
             Discriminator loss for logging.
         """
-        batch = batch[0]
+        x = batch[0]
+        cond = batch[1] if self.hparams.cond_features > 0 else None
         opt_g, opt_d = self.optimizers()
         sched_d, sched_g = self.lr_schedulers()
         sched_d.step()
         sched_g.step()
 
         # Train discriminator
-        z = torch.normal(0, 1, size=(batch.shape[0], 2), device=self.device)
-        xhat = self.generator(z)
+        z = torch.normal(0, 1, size=(x.shape[0], 2), device=self.device)
+        xhat = self.generator(z, cond)
         opt_d.zero_grad()
-        d_loss = self.loss(self.discriminator(batch), self.discriminator(xhat), critic=True)
+        d_loss = self.loss(self.discriminator(x, cond), self.discriminator(xhat), critic=True)
         self.log('d_loss', d_loss, on_step=True, on_epoch=False, logger=True)
 
-        if self.gan_type == "wgan" and not self.spectral:
-            gp = 10 * gradient_penalty(batch, xhat, self.discriminator)
+        if self.hparams.gp:
+            gp = 10 * gradient_penalty(x, xhat, self.discriminator, cond=cond, GP=self.hparams.gp_value)
             d_loss = d_loss + gp
             self.log('gp', gp, on_step=True, on_epoch=False, logger=True)
 
@@ -90,13 +101,15 @@ class GAN(pl.LightningModule):
         # Train generator
         if self.global_step > 100:
             opt_g.zero_grad()
-            z = torch.normal(0, 1, size=(batch.shape[0], 2), device=self.device)
-            xhat = self.generator(z)
-            g_loss = self.loss(None, self.discriminator(xhat), critic=False)
+            z = torch.normal(0, 1, size=(x.shape[0], 2), device=self.device)
+            xhat,lhat = self.generator(z, cond, feature_matching=True)
+            g_loss = self.loss(None, self.discriminator(xhat, cond), critic=False)
+            if self.hparams.fm:
+                _,l = self.discriminator(x, cond, feature_matching=True)
+                g_loss = (lhat-l).pow(2).mean()
             self.manual_backward(g_loss)
             opt_g.step()
             self.log('g_loss', g_loss, on_step=True, on_epoch=False, logger=True)
-        return d_loss
 
     def on_validation_epoch_start(self):
         """
@@ -122,6 +135,7 @@ class GAN(pl.LightningModule):
         cond = batch[1] if len(batch) > 1 else None
 
         z = torch.normal(0, 1, size=(x.shape[0], 2), device=self.device)
+
         xhat = self.generator(z)
         yhat = self.discriminator(xhat)
         y = self.discriminator(x)
@@ -132,5 +146,5 @@ class GAN(pl.LightningModule):
         self.y.append(cond)
         self.z.append(z)
         self.x.append(x)
-        return loss
+
 

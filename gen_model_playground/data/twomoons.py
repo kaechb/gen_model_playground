@@ -45,6 +45,8 @@ class TwoMoonsDataModule(pl.LightningDataModule):
     def generate_dataset(self):
         """
         Generates the Two Moons dataset.
+        Standardscales the dataset.
+
         """
         # Create the dataset
         X, y = make_moons(n_samples=self.num_batches * self.batch_size, noise=self.noise)
@@ -53,6 +55,7 @@ class TwoMoonsDataModule(pl.LightningDataModule):
         self.mu, self.std = X.mean(axis=0), X.std(axis=0)
         self._min, self._max = X.min(axis=0), X.max(axis=0)
         X = (X - self.mu) / self.std
+        self.scaled_min, self.scaled_max = X.min(axis=0), X.max(axis=0)
         self.dataset = TensorDataset(X, y)
 
     def train_dataloader(self):

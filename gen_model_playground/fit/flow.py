@@ -23,6 +23,7 @@ class Flow(pl.LightningModule):
         super().__init__()
         self.save_hyperparameters()
         self.save_name = self.hparams.name + "_" + self.hparams.flow_type
+        self.save_name += "_cond" if self.hparams.cond_features > 0 else ""
         self.flow = self.construct_flow()
         self.automatic_optimization = False  # Disable automatic optimization
         self.name = self.hparams.name
@@ -35,7 +36,7 @@ class Flow(pl.LightningModule):
             The constructed flow model.
         """
         flows = []
-        for i in range(self.hparams.ncoupling):
+        for i in range(self.hparams.n_coupling):
             mask = create_random_binary_mask(self.hparams.in_features)
             layer_networks = lambda x, y: Model(x, y, hidden_features=self.hparams.hidden_features, cond_features=self.hparams.cond_features, num_blocks=self.hparams.num_blocks, spectral=self.hparams.spectral, batch_norm=self.hparams.batch_norm, residual=self.hparams.residual)
             if self.hparams.flow_type != "affine":
@@ -72,6 +73,29 @@ class Flow(pl.LightningModule):
         """
         return self.flow.sample(x.shape[0] if cond is None else 1, context=cond)
 
+    def sample(self, batch, cond=None, t_stop=1, return_latent=False):
+        """
+        Samples from the flow model.
+
+        Args:
+            batch: Batch size.
+            cond: Conditional inputs.
+            t_stop: Time parameter, unused in this context.
+            return_latent: Flag to return latent space variables.
+
+        Returns:
+            Sampled output and optionally latent space variables.
+        """
+        with torch.no_grad():
+            x0 = torch.randn(len(batch), self.hparams.in_features).to(self.device)
+            if cond is not None:
+                z = self.flow.sample(1, context=cond).squeeze(1)
+            else:
+                z = self.flow.sample(len(batch), context=cond)
+            if return_latent:
+                return z, x0
+            else:
+                return z
     def on_validation_epoch_start(self):
         """
         Prepares variables for tracking during the validation epoch.
@@ -121,12 +145,10 @@ class Flow(pl.LightningModule):
         cond = batch[1] if self.hparams.cond_features > 0 else None
         log_likelihood = self.flow.log_prob(inputs=x, context=cond)
         loss = -torch.mean(log_likelihood)
-        z = self.flow.transform_to_noise(x).squeeze(1)
+        z = self.flow.transform_to_noise(x, context=cond).squeeze(1)
 
         self.log("val/loss", loss, on_step=False, on_epoch=True, prog_bar=False, logger=True)
-        self.xhat.append(self(x, cond))
+        self.xhat.append(self(x, cond=cond).squeeze(1))
         self.y.append(batch[1])
         self.x.append(x)
         self.z.append(z)
-
-        return loss

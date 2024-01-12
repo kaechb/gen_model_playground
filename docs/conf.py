@@ -27,22 +27,7 @@ sys.path.insert(0, os.path.abspath("../"))
 import mock
 
 MOCK_MODULES = [
-    "matplotlib",
-    "matplotlib.pyplot",
-    "matplotlib.colors",
-    "torchdyn",
-    "torchcfm",
-    "torchmetrics",
-    "pl_bolts",
-    "pl_bolts.optimizers.lr_scheduler",
-    "torchdyn.core",
-    "torchdyn.models",
-    "nflows.flows.base",
-    "nflows.utils.torchutils",
-    "nflows.transforms.base",
-    "nflows.transforms.coupling",
-    "nflows",
-    "torchcfm.conditional_flow_matching",
+
 ]
 for mod_name in MOCK_MODULES:
     sys.modules[mod_name] = mock.Mock()

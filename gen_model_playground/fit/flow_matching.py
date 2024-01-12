@@ -35,6 +35,7 @@ class FM(pl.LightningModule):
         self.save_hyperparameters()
         self.automatic_optimization = False
         self.save_name=self.hparams.matching+"flow_matching"
+        self.save_name += "_cond" if self.hparams.cond_features > 0 else ""
         self.name=self.hparams.name
         self.net = Model(**self.hparams).to("cuda")
         self.flow_matcher = ConditionalFlowMatcher(sigma=1e-4) if self.hparams.matching=="target" else SchrodingerBridgeConditionalFlowMatcher(sigma=1e-4) if not self.hparams.matching=="exact" else ExactOptimalTransportConditionalFlowMatcher()
@@ -71,11 +72,7 @@ class FM(pl.LightningModule):
         self.data_module=data_module
 
 
-    def forward(self,x):
-        return self.sample(x)
-
-
-    def sample(self,batch,cond=None,t_stop=1,return_latent=False):
+    def sample(self,batch,cond=None,t_stop=1,return_traj=False):
         '''This is a helper function that samples from the flow (i.e. generates a new sample)
             and reverses the standard scaling that is done in the preprocessing. This allows to calculate the mass
             on the generative sample and to compare to the simulated one, we need to inverse the scaling before calculating the mass
@@ -83,12 +80,12 @@ class FM(pl.LightningModule):
         with torch.no_grad():
             x0 = torch.randn(batch.shape).to(self.device)
             wrapped_cnf = torch_wrapper(model=self.net )
-            node=NeuralODE(lambda t,x,args: wrapped_cnf(t,x), solver="midpoint", sensitivity="adjoint", atol=1e-4, rtol=1e-4)
+            node=NeuralODE(lambda t,x,args: wrapped_cnf(t,x), solver=self.hparams.solver, sensitivity="adjoint", atol=1e-4, rtol=1e-4)
             samples = node.trajectory(x0, t_span=torch.linspace(0, t_stop, self.hparams.num_steps).to(self.device),)
-            if not return_latent:
+            if not return_traj:
                 return samples[-1,:,:]
             else:
-                return samples[-1,:,:],x0
+                return samples[-1,:,:],samples
 
     def configure_optimizers(self):
         optimizer = torch.optim.Adam(self.parameters(), lr=self.hparams.lr)
@@ -139,11 +136,11 @@ class FM(pl.LightningModule):
 
             vt = self.net(xt,t).cuda()
             loss = torch.mean((vt - ut) ** 2)
-            xhat,z=self.sample(batch,return_latent=True)
-            self.z.append(z)
+            xhat,traj=self.sample(batch,return_traj=True)
+            self.z.append(traj[0])
             self.xhat.append(xhat)
 
-            self.log("train/loss", loss, on_step=False, on_epoch=True, prog_bar=False)
-            self.log("train/mean",vt.mean(), on_step=False, on_epoch=True, prog_bar=False)
-            self.log("train/std",vt.std(), on_step=False, on_epoch=True, prog_bar=False)
-        return loss
+            self.log("val/loss", loss, on_step=False, on_epoch=True, prog_bar=False)
+            self.log("val/mean",vt.mean(), on_step=False, on_epoch=True, prog_bar=False)
+            self.log("val/std",vt.std(), on_step=False, on_epoch=True, prog_bar=False)
+

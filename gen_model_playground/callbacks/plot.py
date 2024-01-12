@@ -32,21 +32,27 @@ class PlotCallback(pl.Callback):
             pl_module: The PyTorch Lightning module (model) being trained.
         """
         # Create directories for saving plots
+        lims=[[pl_module.hparams.scaled_min[0]*1.1,pl_module.hparams.scaled_max[0]*1.1]
+              ,[pl_module.hparams.scaled_min[1]*1.1,pl_module.hparams.scaled_max[1]*1.1]]
+
         os.makedirs(f"{os.getcwd()}/plots", exist_ok=True)
         os.makedirs(f"{os.getcwd()}/plots/{pl_module.save_name}", exist_ok=True)
 
         # Plot and save reconstructions if they exist
         if hasattr(pl_module, "xrec"):
-            figrec, axrec = plot(torch.cat(pl_module.xrec).cpu().numpy(), torch.cat(pl_module.x).cpu().numpy())
+            figrec, axrec = plot(torch.cat(pl_module.xrec).cpu().numpy(), torch.cat(pl_module.x).cpu().numpy(),lims=lims)
             if isinstance(self.logger, WandbLogger):
                 self.logger.log_image("reconstruction", [figrec], trainer.global_step)
             figrec.savefig(f"{os.getcwd()}/plots/{pl_module.save_name}/{pl_module.save_name}_rec.pdf", format="pdf")
             plt.close()
 
         # Plot and save latent representations if they exist
-        if hasattr(pl_module, "z") and len(pl_module.z) > 0:
+        if hasattr(pl_module, "z") and len(pl_module.z) > 0 and (pl_module.save_name.find("nf")>-1 or pl_module.save_name.find("matching")>-1):
+
             lower = torch.cat(pl_module.z).cpu().numpy()[torch.cat(pl_module.y).cpu().numpy() == 1]
             upper = torch.cat(pl_module.z).cpu().numpy()[torch.cat(pl_module.y).cpu().numpy() == 0]
+
+
             figlatent, axlatent = plot_latent(lower, upper)
             if isinstance(self.logger, WandbLogger):
                 self.logger.log_image("latent", [figlatent], trainer.global_step)
@@ -54,10 +60,10 @@ class PlotCallback(pl.Callback):
             plt.close()
 
         # Plot and save generated samples
-        fig, ax = plot(torch.cat(pl_module.xhat).cpu().numpy(), torch.cat(pl_module.x).cpu().numpy())
+        fig, ax = plot(torch.cat(pl_module.xhat).cpu().numpy(), torch.cat(pl_module.x).cpu().numpy(),lims=lims)
         fig.savefig(f"{os.getcwd()}/plots/{pl_module.save_name}/{pl_module.save_name}_samples.pdf", format="pdf")
-        plt.close()
 
         # Log the samples image if the logger is WandbLogger
         if isinstance(self.logger, WandbLogger):
             self.logger.log_image("samples", [fig], trainer.global_step)
+        plt.close()

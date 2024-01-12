@@ -21,12 +21,19 @@ class VAE(pl.LightningModule):
         """
         super().__init__()
         self.save_hyperparameters()
-        self.encoder = Model(in_features=self.hparams.in_features, out_features=2 * self.hparams.encoding_dim, num_blocks=self.hparams.num_blocks, hidden_features=self.hparams.hidden_features, cond_features=self.hparams.cond_features, spectral=self.hparams.spectral, batch_norm=self.hparams.batch_norm, residual=self.hparams.residual)
-        self.decoder = Model(in_features=self.hparams.encoding_dim, out_features=self.hparams.encoding_dim, num_blocks=self.hparams.num_blocks, hidden_features=self.hparams.hidden_features, cond_features=self.hparams.cond_features, spectral=self.hparams.spectral, batch_norm=self.hparams.batch_norm, residual=self.hparams.residual)
+        self.encoder = Model(in_features=self.hparams.in_features, out_features=2 * self.hparams.encoding_dim if self.hparams.name.find("vae")>-1 else self.hparams.encoding_dim, num_blocks=self.hparams.num_blocks, hidden_features=self.hparams.hidden_features, cond_features=self.hparams.cond_features, spectral=self.hparams.spectral, batch_norm=self.hparams.batch_norm, residual=self.hparams.residual)
+        self.decoder = Model(in_features=self.hparams.encoding_dim, out_features=self.hparams.in_features, num_blocks=self.hparams.num_blocks, hidden_features=self.hparams.hidden_features, cond_features=self.hparams.cond_features, spectral=self.hparams.spectral, batch_norm=self.hparams.batch_norm, residual=self.hparams.residual)
         self.beta = 0
         self.name = self.hparams.name
         self.save_name = self.hparams.name
         self.eps = 1e-8
+        self.save_name += str(self.hparams.encoding_dim)
+        self.save_name += "_cond" if self.hparams.cond_features > 0 else ""
+        self.save_name += "_spectral" if self.hparams.spectral else ""
+        self.save_name += "_residual" if self.hparams.residual else ""
+        self.save_name += "_bn" if self.hparams.batch_norm else ""
+        self.save_name += "_ema" if self.hparams.ema else ""
+
         self.automatic_optimization = False  # Disable automatic optimization
 
     def configure_optimizers(self):
@@ -40,17 +47,17 @@ class VAE(pl.LightningModule):
         sched = LinearWarmupCosineAnnealingLR(optimizer, warmup_epochs=self.hparams.max_epochs * self.hparams.num_batches // 10, max_epochs=self.hparams.max_epochs * self.hparams.num_batches)
         return [optimizer], [sched]
 
-    def forward(self, z):
+    def sample(self, z, cond=None):
         """
-        Forward pass through the decoder.
+        Samples from the decoder.
 
         Args:
             z: Latent space representation.
 
         Returns:
-            Reconstructed output.
+            Generated samples.
         """
-        return self.decoder(z)
+        return self.decoder(z, cond=cond)
 
     def training_step(self, batch, batch_idx):
         """
@@ -75,30 +82,43 @@ class VAE(pl.LightningModule):
 
         # Encoder step
         z = self.encoder(x)
-        mu, logvar = z[:, :self.hparams.encoding_dim], z[:, self.hparams.encoding_dim:]
-        std = logvar.exp()
-        eps = torch.randn_like(std)
-        z = eps.mul(std).add(mu)
+        kl_div = 0
+        if self.name.find("vae")>-1:
+            mu, logvar = z[:, :self.hparams.encoding_dim], z[:, self.hparams.encoding_dim:]
+            std = logvar.mul(0.5).exp_()
+            eps = torch.randn_like(std)
+            z = eps.mul(std).add(mu)
+            kl_div = -0.5*(1 + logvar - mu.pow(2) - logvar.exp()).sum(1).mean()
 
         # Decoder step
+        if self.hparams.cond_features > 0:
+            cond = batch[1]
+            z = torch.cat((z, cond), dim=-1)
+
         xhat = self.decoder(z)
         loss = torch.sum((xhat - batch[0]) ** 2, dim=1).mean()
-        kl_div = (std**2 + mu**2 - torch.log(std + self.eps) - 0.5).sum(1).mean()
+
+
         loss += self.beta * kl_div
 
         opt.zero_grad()
         loss.backward()
         opt.step()
-
+        self.log("train/beta", self.beta, on_step=True, on_epoch=False, prog_bar=False, logger=True)
         self.log("train/loss", loss, on_step=True, on_epoch=False, prog_bar=False, logger=True)
         self.log("train/kl_div", kl_div, on_step=True, on_epoch=False, prog_bar=False, logger=True)
         return loss
+
+    def on_train_epoch_end(self):
+        """
+        Ramps up the weight of the KL divergence term in the loss.
+        """
+        self.beta = float(self.current_epoch) / self.hparams.max_epochs  if not self.name == "ae" else self.beta
 
     def on_validation_epoch_start(self):
         """
         Prepares variables for tracking during the validation epoch.
         """
-        self.beta = float(self.current_epoch) / self.hparams.max_epochs / 2 if not self.name == "ae" else self.beta
         self.xhat = []
         self.xrec = []
         self.y = []
@@ -119,12 +139,20 @@ class VAE(pl.LightningModule):
         x = batch[0]
         cond = batch[1] if len(batch) > 1 else None
 
+        if self.hparams.cond_features > 0:
+            cond = batch[1]
+            x = torch.cat((x, cond), dim=-1)
         z = self.encoder(x)
-        mu, logvar = z[:, :self.hparams.encoding_dim], z[:, self.hparams.encoding_dim:]
-        std = logvar.mul(0.5).exp_()
-        eps = torch.randn_like(std)
-        z = eps.mul(std).add_(mu)
+        if self.name.find("vae")>-1:
+            mu, logvar = z[:, :self.hparams.encoding_dim], z[:, self.hparams.encoding_dim:]
+            std = logvar.mul(0.5).exp_()
+            eps = torch.randn_like(std)
+            z = eps.mul(std).add_(mu)
         self.z.append(z)
+
+        if self.hparams.cond_features > 0:
+            cond = batch[1]
+            z = torch.cat((z, cond), dim=-1)
         xrec = self.decoder(z)
 
         # Random sampling for validation

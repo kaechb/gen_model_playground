@@ -18,7 +18,7 @@ class wrapper(torch.nn.Module):
         super(wrapper, self).__init__()
         self.model = model
 
-    def forward(self, t, x_aug, args=None):
+    def forward(self, t, x_aug, args=None,cond=None):
         """
         Forward pass through the wrapper.
 
@@ -67,8 +67,6 @@ class CNF(pl.LightningModule):
         self.vf = wrapper(Model(**self.hparams).to("cuda"))
         self.node = NeuralODE(self.vf, sensitivity='adjoint', solver='euler')
 
-    def forward(self, x):
-        return self.sample(x)
 
     def compute_loss(self, z, logpz):
         """
@@ -94,7 +92,7 @@ class CNF(pl.LightningModule):
         """
         self.data_module = data_module
 
-    def sample(self, batch, cond=None, t_stop=1, ema=False):
+    def sample(self, batch, cond=None, t_stop=1):
         """
         Samples from the CNF model.
 
@@ -102,7 +100,7 @@ class CNF(pl.LightningModule):
             batch: The input batch for sampling.
             cond: Conditional inputs, if any.
             t_stop: End time for the ODE solver.
-            ema: Flag for using Exponential Moving Average, if applicable.
+
 
         Returns:
             The generated samples.
@@ -161,8 +159,7 @@ class CNF(pl.LightningModule):
         self.z = []
         self.y = []
         self.prob = []
-        self.vf.train()
-        self.node.train()
+
 
     def validation_step(self, batch, batch_idx):
         """
@@ -188,12 +185,12 @@ class CNF(pl.LightningModule):
 
             # Compute loss
             loss = self.compute_loss(z, logpz)
-            self.log("val/loss", loss, on_step=False, on_epoch=True, prog_bar=False, logger=True)
+            self.log("val/loss", loss.detach(), on_step=False, on_epoch=True, prog_bar=False, logger=True)
 
-            # Sampling for validation
-            xhat = self.sample(x)
-            self.xhat.append(xhat.detach())
-            self.z.append(z.detach())
-            self.y.append(batch[1])
+        # Sampling for validation
+        xhat = self.sample(x)
+        self.xhat.append(xhat.detach())
+        self.z.append(z.detach())
+        self.y.append(batch[1])
 
         # End of the CNF class definition

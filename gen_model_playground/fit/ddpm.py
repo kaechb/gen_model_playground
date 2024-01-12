@@ -62,16 +62,19 @@ class DDPM(pl.LightningModule):
         self.save_hyperparameters()
         self.automatic_optimization = False
         self.save_name = self.hparams.name
+        self.save_name += "_cond" if self.hparams.cond_features > 0 else ""
         self.name = self.hparams.name
-        self.net = Model(**self.hparams).to("cuda")
+        self.net = Model(**self.hparams).to(self.device)
 
         # Setting up the noise schedule for DDPM
         s = 0.008  # Noise variance beta
-        timesteps = torch.tensor(range(0, self.hparams.num_steps), dtype=torch.float32).to("cuda" if torch.cuda.is_available() else "cpu")
-        schedule = torch.cos((timesteps / self.hparams.num_steps + s) / (1 + s) * torch.pi / 2)**2
-        self.baralphas = schedule / schedule[0]
-        self.betas = 1 - self.baralphas / torch.cat([self.baralphas[0:1], self.baralphas[:-1]])
-        self.alphas = 1 - self.betas
+
+        self.register_buffer("timesteps", torch.tensor(range(0, self.hparams.num_steps), dtype=torch.float32))
+        self.register_buffer("schedule", torch.cos((self.timesteps / self.hparams.num_steps + s) / (1 + s) * torch.pi / 2)**2)
+        self.register_buffer("baralphas", self.schedule / self.schedule[0])
+
+        self.register_buffer("betas", 1 - self.baralphas / torch.cat([self.baralphas[0:1], self.baralphas[:-1]]))
+        self.register_buffer("alphas",  1 - self.betas)
         self.loss = nn.MSELoss()
 
 
@@ -85,13 +88,8 @@ class DDPM(pl.LightningModule):
         """
         self.data_module = data_module
 
-    def forward(self,x):
-        """
-        Generating with DDPM model.
-        """
-        return self.sample(x)
 
-    def sample(self, batch, return_traj=False):
+    def sample(self, batch, return_traj=False, cond=None):
         """
         Generates samples from the DDPM model.
 
@@ -106,13 +104,15 @@ class DDPM(pl.LightningModule):
             x = torch.randn(batch.shape).to(self.device)
             xt = [x]
             for t in reversed(range(1, self.hparams.num_steps)):
-                predicted_noise = self.net(x, torch.full([len(batch), 1], t).to(self.device))
+
+                predicted_noise = self.net(x, t=torch.full([len(batch), 1], t).to(self.device),cond=cond)
                 x = 1 / (self.alphas[t] ** 0.5) * (x - (1 - self.alphas[t]) / ((1 - self.baralphas[t]) ** 0.5) * predicted_noise)
                 if t > 1:
                     variance = self.betas[t]
                     x += (variance ** 0.5) * torch.randn(size=(len(batch), batch.shape[1]), device=self.device)
                 xt.append(x)
-            return xt if return_traj else xt[-1]
+
+            return (xt[-1],xt) if return_traj else xt[-1]
 
     def configure_optimizers(self):
         optimizer = torch.optim.Adam(self.parameters(), lr=self.hparams.lr)
@@ -149,10 +149,11 @@ class DDPM(pl.LightningModule):
         opt = self.optimizers()
         sched = self.lr_schedulers()
         sched.step()
+        cond = batch[1] if self.hparams.cond_features > 0 else None
         batch = batch[0]
         timesteps = torch.randint(0, self.hparams.num_steps, size=[len(batch), 1], device=self.device)
         noised, eps = self.noise(batch, timesteps)
-        predicted_noise = self.net(noised, timesteps)
+        predicted_noise = self.net(noised,t= timesteps,cond=cond)
         loss = self.loss(predicted_noise, eps)
         opt.zero_grad()
         loss.backward()
@@ -181,6 +182,7 @@ class DDPM(pl.LightningModule):
         """
         with torch.no_grad():
             self.y.append(batch[1])
+            cond = batch[1] if self.hparams.cond_features > 0 else None
             batch = batch[0]
             self.x.append(batch)
             timesteps = torch.randint(0, self.hparams.num_steps, size=[len(batch), 1], device=self.device)
@@ -188,7 +190,7 @@ class DDPM(pl.LightningModule):
             predicted_noise = self.net(noised, timesteps)
             loss = self.loss(predicted_noise, eps)
             self.log("val/loss", loss, on_step=False, on_epoch=True, prog_bar=False)
-            trajectory = self.sample(batch, return_traj=True)
+            _,trajectory = self.sample(batch, cond=cond, return_traj=True)
             self.xhat.append(trajectory[-1])
             self.z.append(trajectory[0])
 

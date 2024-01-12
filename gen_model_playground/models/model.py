@@ -18,7 +18,7 @@ class Model(nn.Module):
         time_features: Dimension of time-related features.
         bias: Flag to use bias in linear layers.
     """
-    def __init__(self, in_features: int, out_features: int, num_blocks: int = 4, hidden_features: int = 64, cond_features=0, spectral=False, batch_norm=True, residual=True, time_features=0, bias=False, **kwargs):
+    def __init__(self, in_features: int, out_features: int, num_blocks: int = 4, hidden_features: int = 64, cond_features=0, spectral=False, batch_norm=True, residual=True, time_features=0, bias=False, dropout=0.0,**kwargs):
         super(Model, self).__init__()
 
         # Time feature flag
@@ -30,7 +30,7 @@ class Model(nn.Module):
             self.inblock = spectral_norm(self.inblock)
 
         # Creating a list of middle blocks
-        self.midblocks = nn.ModuleList([Block(hidden_features, spectral, batch_norm, bias, time_features) for _ in range(num_blocks)])
+        self.midblocks = nn.ModuleList([Block(hidden_features, spectral, batch_norm, bias, time_features,int(cond_features),dropout) for _ in range(num_blocks)])
 
         # Initializing output block with optional spectral normalization
         self.outblock = nn.Linear(hidden_features, out_features, bias=bias)
@@ -43,7 +43,7 @@ class Model(nn.Module):
         # Residual connection flag
         self.residual = residual
 
-    def forward(self, x: torch.Tensor, t=None, cond=None, feature_matching=False) -> torch.Tensor:
+    def forward(self, x: torch.Tensor, t=None,  cond=None, feature_matching=False) -> torch.Tensor:
         """
         Forward pass of the model.
 
@@ -66,6 +66,8 @@ class Model(nn.Module):
 
         # Processing conditional features
         if cond is not None:
+            if len(cond.shape)==1:
+                cond = cond.unsqueeze(1)
             x = torch.cat((x, cond), dim=-1)
 
         # Input block
@@ -73,7 +75,8 @@ class Model(nn.Module):
 
         # Iterating through middle blocks
         for midblock in self.midblocks:
-            val = val + midblock(val, t) if self.residual else midblock(val, t)
+
+            val = val + midblock(val, t=t, cond=cond) if self.residual else midblock(val, t=t, cond=cond)
 
         # Activation and output block
         x = self.act(val)
@@ -94,11 +97,11 @@ class Block(nn.Module):
         bias: Flag to use bias in linear layers.
         time_features: Dimension of time-related features.
     """
-    def __init__(self, hidden_features, spectral, batch_norm, bias, time_features=0):
+    def __init__(self, hidden_features, spectral, batch_norm, bias, time_features=0, cond_features=0,dropout=0.0):
         super(Block, self).__init__()
 
         # Initializing first linear layer with optional spectral normalization
-        self.linear = nn.Linear(hidden_features + time_features, hidden_features, bias=bias)
+        self.linear = nn.Linear(hidden_features + time_features + cond_features, hidden_features, bias=bias)
         if spectral:
             self.linear = spectral_norm(self.linear)
 
@@ -109,12 +112,12 @@ class Block(nn.Module):
 
         # Activation function
         self.act = lambda x: x * torch.nn.functional.sigmoid(x)
-
+        self.dropout = nn.Dropout(dropout)
         # Batch normalization or identity layers
-        self.bn = nn.BatchNorm1d(hidden_features, track_running_stats=True) if batch_norm else nn.Identity()
+        self.bn = nn.BatchNorm1d(hidden_features + cond_features, track_running_stats=True) if batch_norm else nn.Identity()
         self.bn2 = nn.BatchNorm1d(hidden_features, track_running_stats=True) if batch_norm else nn.Identity()
 
-    def forward(self, x: torch.Tensor, t=None):
+    def forward(self, x: torch.Tensor, t=None, cond=None):
         """
         Forward pass of the block.
 
@@ -125,9 +128,14 @@ class Block(nn.Module):
         Returns:
             Processed tensor.
         """
+        # Adding cond
+        if cond is not None:
+            if len(cond.shape)==1:
+                cond = cond.unsqueeze(1)
+            x = torch.cat((x, cond), dim=-1)
         # Processing input with batch normalization and activation
         x = self.linear(self.act(self.bn(x))) if t is None else self.linear(self.act(torch.cat((self.bn(x), t), dim=-1)))
-
+        x = self.dropout(x)
         # Second linear layer with batch normalization and activation
         x = self.linear2(self.act(self.bn2(x)))
 

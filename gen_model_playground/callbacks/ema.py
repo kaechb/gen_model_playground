@@ -37,8 +37,8 @@ class EMA(Callback):
         decay: float,
         apply_ema_every_n_steps: int = 1,
         start_step: int = 0,
-        save_ema_weights_in_callback_state: bool = False,
-        evaluate_ema_weights_instead: bool = False,
+        save_ema_weights_in_callback_state: bool = True,
+        evaluate_ema_weights_instead: bool = True,
         **kwargs
     ):
         if not (0 <= decay <= 1):
