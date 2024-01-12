@@ -12,7 +12,8 @@ Usage
 Check the ``__main__.py`` file for the possible argument configurations.
 So in the end run ``python -m gen_model_playground --{args}`` to run the code, e.g. ``python -m gen_model_playground``.
 Please refer to the documentation within each model template for specific modification tips and best practices.
-
+It is recommended to create a Wandb account and use it for logging and visualization, as it is very easy to use and provides a lot of useful features.
+A documentation for the project is available at https://gen-model-playground.readthedocs.io/en/latest/.
 Contributing
 ============
 
