@@ -10,3 +10,4 @@ lightning
 scikit-learn
 torchdyn
 torchcfm
+nflows
