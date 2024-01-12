@@ -1,5 +1,5 @@
 import argparse
-from gen_model_playground.data import TwoMoonsDataModule
+from gen_model_playground.data import TwoMoonsDataModule, EightGaussiansDataModule
 from gen_model_playground.fit.gan import GAN
 from gen_model_playground.fit.vae import VAE
 from gen_model_playground.fit.flow import Flow
@@ -21,8 +21,11 @@ def get_args():
         argparse.Namespace: The parsed command line arguments.
     """
     parser = argparse.ArgumentParser(description="Configuration")
+    # Dataset selection argument
+    parser.add_argument('--dataset', type=str, default='two_moons', choices=["two_moons","eight_gaussians"], help='Dataset type')
 
     parser.add_argument('--logger', type=str, default='wandb', choices=["wandb","tensorboard","csv"], help='Logger type')
+    parser.add_argument('--save_dir', type=str, default='./', help='Directory to save the experiment results')
     # Model selection argument
     parser.add_argument('--name', type=str, default='ddpm', choices=["gan","vae","ae","nf","cnf","flow_matching","ddpm"], help='model type,')
 
@@ -88,7 +91,7 @@ if __name__ == "__main__":
     if args["name"]=="cnf":
         args["num_batches"]=args["num_batches"]//5
     # Initialize and setup the data module
-    datamodule = TwoMoonsDataModule(batch_size=256, num_batches=args["num_batches"])
+    datamodule = TwoMoonsDataModule(batch_size=256, num_batches=args["num_batches"]) if args["dataset"]=="two_moons" else EightGaussiansDataModule(batch_size=256, num_batches=args["num_batches"])
     datamodule.setup()
     # Update arguments with data-specific parameters
 
@@ -97,7 +100,7 @@ if __name__ == "__main__":
     args["scaled_min"] = datamodule.scaled_min[0]
     args["scaled_max"] = datamodule.scaled_max[0]
     # Initialize WandbLogger for experiment tracking
-    logger = pl.pytorch.loggers.WandbLogger(project="thesis_experiments", save_dir="/beegfs/desy/user/kaechben/thesis_experiments")
+    logger = pl.pytorch.loggers.WandbLogger(project="thesis_experiments", save_dir=args["save_dir"])
     # Update arguments with configurations from the logger if available
     if len(logger.experiment.config.keys()) > 0:
         args.update(**logger.experiment.config)
