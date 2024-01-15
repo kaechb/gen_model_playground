@@ -34,7 +34,7 @@ class FM(pl.LightningModule):
         super().__init__()
         self.save_hyperparameters()
         self.automatic_optimization = False
-        self.save_name=self.hparams.matching+"flow_matching"
+        self.save_name=self.hparams.matching+"flow_matching"+"_"+self.hparams.dataset
         self.save_name += "_cond" if self.hparams.cond_features > 0 else ""
         self.name=self.hparams.name
         self.net = Model(**self.hparams).to("cuda")

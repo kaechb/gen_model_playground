@@ -61,7 +61,7 @@ class CNF(pl.LightningModule):
         super().__init__()
         self.save_hyperparameters()
         self.automatic_optimization = False
-        self.save_name = "cnf"
+        self.save_name = "cnf"+"_"+self.hparams.dataset
         self.name = self.hparams.name
 
         self.vf = wrapper(Model(**self.hparams).to("cuda"))

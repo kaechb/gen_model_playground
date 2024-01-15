@@ -28,7 +28,7 @@ class GAN(pl.LightningModule):
         self.loss = least_squares if self.hparams.gan_type == "lsgan" else wasserstein if self.hparams.gan_type == "wgan" else non_saturating
 
         self.spectral = self.hparams.spectral
-        self.save_name = self.hparams.gan_type
+        self.save_name = self.hparams.gan_type+"_"+self.hparams.dataset
         self.save_name += "_spectral" if self.hparams.spectral else ""
         self.save_name += "_gp"+str(self.hparams.gp_value) if self.hparams.gp  else ""
         self.save_name += "_residual" if self.hparams.residual else ""

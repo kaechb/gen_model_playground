@@ -27,7 +27,7 @@ class VAE(pl.LightningModule):
         self.name = self.hparams.name
         self.save_name = self.hparams.name
         self.eps = 1e-8
-        self.save_name += str(self.hparams.encoding_dim)
+        self.save_name += str(self.hparams.encoding_dim)+"_"+self.hparams.dataset
         self.save_name += "_cond" if self.hparams.cond_features > 0 else ""
         self.save_name += "_spectral" if self.hparams.spectral else ""
         self.save_name += "_residual" if self.hparams.residual else ""

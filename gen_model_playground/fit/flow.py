@@ -22,7 +22,7 @@ class Flow(pl.LightningModule):
         """
         super().__init__()
         self.save_hyperparameters()
-        self.save_name = self.hparams.name + "_" + self.hparams.flow_type
+        self.save_name = self.hparams.name + "_" + self.hparams.flow_type+"_"+self.hparams.dataset
         self.save_name += "_cond" if self.hparams.cond_features > 0 else ""
         self.flow = self.construct_flow()
         self.automatic_optimization = False  # Disable automatic optimization
